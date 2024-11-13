@@ -159,7 +159,7 @@ ifndef REGISTRY
 	REGISTRY ?= localhost:5000
 endif
 STAGING_REGISTRY := gcr.io/k8s-staging-cluster-api-azure
-PROD_REGISTRY := registry.k8s.io/cluster-api-azure
+PROD_REGISTRY ?= registry.k8s.io/cluster-api-azure
 IMAGE_NAME ?= cluster-api-azure-controller
 CONTROLLER_IMG ?= $(REGISTRY)/$(IMAGE_NAME)
 TAG ?= dev
@@ -636,6 +636,9 @@ release: clean-release  ## Builds and push container images using the latest git
 	@if ! [ -z "$$(git status --porcelain)" ]; then echo "Your local git repository contains uncommitted changes, use git clean before proceeding."; exit 1; fi
 	git checkout "${RELEASE_TAG}"
 	# Set the manifest image to the production bucket.
+	echo ""
+	echo "#### Setting the manigest image to: $(PROD_REGISTRY)/$(IMAGE_NAME) and manifest tag to: $(RELEASE_TAG)"
+	echo ""
 	$(MAKE) set-manifest-image MANIFEST_IMG=$(PROD_REGISTRY)/$(IMAGE_NAME) MANIFEST_TAG=$(RELEASE_TAG)
 	$(MAKE) set-manifest-pull-policy PULL_POLICY=IfNotPresent
 	$(MAKE) release-manifests
